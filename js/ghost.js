@@ -4,7 +4,7 @@ import { STUD, PLATE } from './constants.js';
 import { scene, camera } from './scene.js';
 import { makeGroup, disposeGroup, bodyColor } from './factory.js';
 import { computeTarget } from './snapping.js';
-import { getKind } from './kinds.js';
+import { heightPlatesOf } from './kinds.js';
 import { selType, selSize, selColor, rot, effFoot } from './selection.js';
 import { footCells, isValid } from './occupancy.js';
 
@@ -43,7 +43,7 @@ export function updateGhost() {
 }
 
 function positionGhost(st) {
-    const h = getKind(selType).heightPlates * PLATE;
+    const h = heightPlatesOf(selType, selSize) * PLATE;
     const cx = (st.minGX + (st.ew - 1) / 2) * STUD;
     const cz = (st.minGZ + (st.ed - 1) / 2) * STUD;
     ghost.position.set(cx, st.level * PLATE + h / 2, cz);
@@ -77,7 +77,7 @@ export function nudge(dir) {
 
     const st = { ...ghostState, minGX: ghostState.minGX + dgx, minGZ: ghostState.minGZ + dgz };
     st.cells = footCells(st.minGX, st.minGZ, st.ew, st.ed);
-    st.valid = isValid(st.cells, st.level, getKind(selType).heightPlates);
+    st.valid = isValid(st.cells, st.level, heightPlatesOf(selType, selSize));
     ghostState = st;
     positionGhost(st);
 }

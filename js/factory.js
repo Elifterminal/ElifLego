@@ -1,7 +1,7 @@
 // Builds a Three.js group for any registered kind. Used for both real pieces and ghosts.
 import * as THREE from 'three';
 import { STUD, PLATE, STUD_H, STUD_R } from './constants.js';
-import { getKind, footprint } from './kinds.js';
+import { getKind, footprint, heightPlatesOf } from './kinds.js';
 import { current as theme, registerEdgeMat } from './themes.js';
 
 // The color a piece should use: picked color for colorable kinds, else the kind's fixed color.
@@ -13,7 +13,7 @@ export function bodyColor(kindId, pickedColor) {
 export function makeGroup(kindId, size, colorHex, opts = {}) {
     const k = getKind(kindId);
     const [fw, fd] = footprint(size);
-    const hP = k.heightPlates, h = hP * PLATE;
+    const hP = heightPlatesOf(kindId, size), h = hP * PLATE;
     const ghostMode = !!opts.ghost;
 
     const g = new THREE.Group();

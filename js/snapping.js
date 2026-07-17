@@ -5,8 +5,8 @@ import * as THREE from 'three';
 import { STUD, PLATE } from './constants.js';
 import { camera, raycaster, pointer } from './scene.js';
 import { placedMeshes } from './blocks.js';
-import { getKind } from './kinds.js';
-import { selType, effFoot, stickyLevel, setSticky } from './selection.js';
+import { heightPlatesOf } from './kinds.js';
+import { selType, selSize, effFoot, stickyLevel, setSticky } from './selection.js';
 import { footCells, isValid } from './occupancy.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -26,7 +26,7 @@ export function computeTarget() {
     if (!selType) return null;
     raycaster.setFromCamera(pointer, camera);
     const [ew, ed] = effFoot();
-    const hP = getKind(selType).heightPlates;
+    const hP = heightPlatesOf(selType, selSize);
 
     const hits = raycaster.intersectObjects(placedMeshes, false);
     const levels = [];

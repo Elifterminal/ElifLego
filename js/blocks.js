@@ -2,7 +2,7 @@
 import { PLATE } from './constants.js';
 import { scene, camera, raycaster, pointer } from './scene.js';
 import { makeGroup, disposeGroup, bodyColor } from './factory.js';
-import { getKind } from './kinds.js';
+import { getKind, heightPlatesOf } from './kinds.js';
 import { selType, selSize, selColor, rot } from './selection.js';
 import { STUD } from './constants.js';
 import { addVoxels, removeVoxels, isValid } from './occupancy.js';
@@ -15,7 +15,7 @@ let hoveredRoot = null;
 export function placeAt(st) {
     if (!st) return;
     // Re-validate against live occupancy (guards double-taps, keeps nudged positions honest).
-    const hP = getKind(selType).heightPlates;
+    const hP = heightPlatesOf(selType, selSize);
     if (!isValid(st.cells, st.level, hP)) return false;
 
     const h = hP * PLATE;

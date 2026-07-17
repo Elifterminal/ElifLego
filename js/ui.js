@@ -56,7 +56,7 @@ function buildPalette() {
         kind.sizes.forEach(size => {
             const b = document.createElement('button');
             b.className = 'block-button';
-            b.textContent = size;
+            b.textContent = sizeLabel(size);
             b.dataset.type = kind.id;
             b.dataset.size = size;
             b.addEventListener('click', () => selectPiece(b));
@@ -64,6 +64,14 @@ function buildPalette() {
         });
         pal.appendChild(grid);
     });
+}
+
+// "1x1@6" -> "1x1 ×2" (height in bricks); plain sizes pass through.
+function sizeLabel(size) {
+    const at = size.indexOf('@');
+    if (at === -1) return size;
+    const bricks = Number(size.slice(at + 1)) / 3;
+    return size.slice(0, at) + ' ×' + (Number.isInteger(bricks) ? bricks : bricks.toFixed(1));
 }
 
 function selectPiece(btn) {
