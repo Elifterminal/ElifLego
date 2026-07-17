@@ -21,12 +21,13 @@ export function makeGroup(kindId, size, colorHex, opts = {}) {
     const emissiveBase = k.emissive || 0x000000;
     const ghostMats = { bodies: [] };
 
-    // Spinning parts put their visual into a rotor child the animation loop can turn.
+    // Parts that rotate (movable + driveline) put their visual into a rotor child.
     let rotor = null, visual = g;
-    if (k.spin && !ghostMode) { rotor = new THREE.Group(); g.add(rotor); visual = rotor; }
+    const needsRotor = (k.spin || k.rotates) && !ghostMode;
+    if (needsRotor) { rotor = new THREE.Group(); g.add(rotor); visual = rotor; }
 
     const twoSided = ['slope','islope','cslope','curveslope','shaft-fluted'].includes(kindId)
-        || kindId.startsWith('arch') || kindId.startsWith('window') || kindId.startsWith('door') || !!k.spin;
+        || kindId.startsWith('arch') || kindId.startsWith('window') || kindId.startsWith('door') || !!k.spin || !!k.rotates;
     const bodyMat = new THREE.MeshStandardMaterial({
         color: colorHex, emissive: emissiveBase,
         roughness: 0.5, metalness: 0.12,
@@ -84,7 +85,7 @@ export function makeGroup(kindId, size, colorHex, opts = {}) {
     }
 
     g.userData = Object.assign(g.userData || {}, { type: kindId, size, fw, fd, hP, h });
-    if (rotor) { g.userData.spin = k.spin; g.userData.rotor = rotor; }
+    if (rotor) { g.userData.rotor = rotor; g.userData.rotAxis = k.spin?.axis || 'x'; if (k.spin) g.userData.spin = k.spin; }
     if (ghostMode) g.userData.ghostMats = ghostMats;
     return g;
 }

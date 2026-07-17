@@ -6,7 +6,7 @@ import { buildUI, updateModePill } from './ui.js';
 import { setupEvents } from './input.js';
 import { placedBlocks } from './blocks.js';
 import { loadBuild } from './persistence.js';
-import { animating } from './motion.js';
+import { driveStep } from './mechanics.js';
 
 const canvas = document.getElementById('lego-canvas');
 const container = document.getElementById('canvas-container');
@@ -27,10 +27,10 @@ function animate() {
     last = now;
     t += dt;
 
+    driveStep(dt);
     for (const b of placedBlocks) {
-        const ud = b.group.userData;
-        if (animating && ud.spin) ud.rotor.rotation[ud.spin.axis] += ud.spin.speed * dt;
-        if (ud.waterInner) { ud.waterInner.rotation.y += 0.02; ud.waterInner.scale.setScalar(0.9 + Math.sin(t * 2) * 0.06); }
+        const w = b.group.userData.waterInner;
+        if (w) { w.rotation.y += 0.02; w.scale.setScalar(0.9 + Math.sin(t * 2) * 0.06); }
     }
     controls.update();
     renderer.render(scene, camera);

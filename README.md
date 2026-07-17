@@ -86,7 +86,21 @@ vertical **side face**, sticking out perpendicular — hover a side and it attac
 to toggle whether the axle's **end** or **middle** sits on the face. Great for a windmill arm
 poking out of a tower.
 
-Note: spin is still per-part, not gear-driven — axles/mounts set position and orientation, not power.
+## Gears & driveline (mechanics)
+
+The first real mechanics: **one axle can turn another**.
+
+- **Crank** (Mechanics tab) drives the axle it's mounted on. A mounted propeller/fan/wheel also
+  drives its axle, so a windmill's blades can power a drivetrain.
+- **Gears** mount on axles. Put a gear on each of two **parallel axles spaced by the sum of the
+  gears' radii** and they **mesh** — the follower turns the opposite way at the tooth ratio
+  (a small gear driving a big one turns it slower, and vice-versa). Rotation propagates through
+  a whole chain of meshed gears, and anything on a driven axle (wheels, more gears) turns with it.
+
+Try: two 4x1 axles two studs apart, a crank on one, a 2x2 gear on each where they meet.
+Turn Animation on and the second axle spins the other way.
+
+Still simple — no torque/load, no conflict handling if a chain is over-constrained.
 
 ## Saving
 

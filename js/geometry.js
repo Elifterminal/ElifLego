@@ -240,6 +240,29 @@ export function pinGeometry(fw, fd, h) {              // short connector pin alo
     return g;
 }
 
+// ---- Mechanics: gear (disc + teeth) and crank (driver handle). Axis along X. ----
+export function gearGeometry(fw, fd, h) {
+    const R = Math.min(fw, fd) * STUD * 0.5;             // pitch radius (used by the mesh solver)
+    const thick = Math.min(fw, fd) * STUD * 0.35;
+    const N = Math.max(8, Math.round(R / (STUD * 0.16)));
+    const geoms = [];
+    const disc = new THREE.CylinderGeometry(R * 0.9, R * 0.9, thick, 20);
+    disc.rotateZ(Math.PI / 2); geoms.push(disc);
+    for (let i = 0; i < N; i++) {
+        const t = new THREE.BoxGeometry(thick * 0.8, STUD * 0.2, STUD * 0.22);
+        t.translate(0, R, 0); t.rotateX(i * 2 * Math.PI / N); geoms.push(t);
+    }
+    return mergeGeoms(geoms);
+}
+
+export function crankGeometry(fw, fd, h) {
+    const geoms = [];
+    const hub = new THREE.CylinderGeometry(STUD * 0.22, STUD * 0.22, STUD * 0.5, 12); hub.rotateZ(Math.PI / 2); geoms.push(hub);
+    const arm = new THREE.BoxGeometry(STUD * 0.2, STUD * 0.95, STUD * 0.2); arm.translate(0, STUD * 0.48, 0); geoms.push(arm);
+    const knob = new THREE.CylinderGeometry(STUD * 0.16, STUD * 0.16, STUD * 0.44, 10); knob.translate(0, STUD * 0.95, 0); knob.rotateZ(Math.PI / 2); geoms.push(knob);
+    return mergeGeoms(geoms);
+}
+
 function rectPath(x0, y0, x1, y1) {                   // clockwise (hole winding)
     const p = new THREE.Path();
     p.moveTo(x0, y0); p.lineTo(x0, y1); p.lineTo(x1, y1); p.lineTo(x1, y0); p.closePath();

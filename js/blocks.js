@@ -75,11 +75,16 @@ export function addBlock(spec, opts = {}) {
 // A movable part attached to an axle: explicit position + axis-aligned orientation, no occupancy.
 function addMounted(spec) {
     const { type, size, color, mount } = spec;
+    const k = getKind(type);
     const g = makeGroup(type, size, color);
     g.position.set(mount.x, mount.y, mount.z);
     g.rotation.y = mountRotation(type, mount.axleChar) * Math.PI / 2;
     scene.add(g);
-    registerBlock(g, [], { type, size, color, mount, level: 0 });
+    const rec = registerBlock(g, [], { type, size, color, mount, level: 0 });
+    const [fw, fd] = footprint(size);
+    rec.role = k.gear ? 'gear' : (k.driver ? 'crank' : (k.spin ? 'movable' : null));
+    rec.radius = k.gear ? Math.min(fw, fd) * STUD * 0.5 : 0;
+    rec.speed = k.driver || 0;
     return true;
 }
 

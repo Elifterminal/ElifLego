@@ -8,4 +8,5 @@ import './doors.js';
 import './pillars.js';
 import './movable.js';
 import './connectors.js';
+import './mechanics.js';
 import './special.js';
