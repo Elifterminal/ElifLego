@@ -6,6 +6,7 @@ import { setPiece, setColor, setRot, setSticky, selType, selSize, selColor } fro
 import { rebuildGhost } from './ghost.js';
 import { setHovered, clearAll } from './blocks.js';
 import { applyTheme } from './scene.js';
+import { saveBuild, exportBuild, importBuild } from './persistence.js';
 
 const modePill = () => document.getElementById('mode-pill');
 let activeCat = null;
@@ -15,7 +16,20 @@ export function buildUI() {
     buildColorRow();
     buildTabs();
     renderCategory(categories()[0]);
-    document.getElementById('clear-all').addEventListener('click', clearAll);
+    buildFileControls();
+}
+
+function buildFileControls() {
+    document.getElementById('clear-all').addEventListener('click', () => { clearAll(); saveBuild(); });
+    document.getElementById('export-build').addEventListener('click', exportBuild);
+
+    const fileInput = document.getElementById('import-file');
+    document.getElementById('import-build').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+        const f = e.target.files[0];
+        if (f) importBuild(f);
+        fileInput.value = '';   // allow re-importing the same file
+    });
 }
 
 function buildThemeSelect() {

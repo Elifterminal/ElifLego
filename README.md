@@ -72,9 +72,15 @@ registerKind({
 It shows up in the palette automatically. For a custom shape, pass your own
 `geometry(fw, fd, h)` builder.
 
+## Saving
+
+Builds **auto-save to `localStorage`** on every place/delete, so they survive a refresh.
+Use **Export** to download a build as JSON and **Import** to load one back (also handy for
+sharing or backup). Clearing the board is persisted too.
+
 ## Roadmap
 
 - Particle water (tiny mass-bearing droplets) for the Water piece
 - Multi-size / multi-brightness light bricks
-- More parts (tiles, round bricks, arches, wedges) as real LEGO elements
-- Save / load builds
+- More parts (windows, doors, curved slopes, wedge plates) as real LEGO elements
+- Named save slots + shareable links

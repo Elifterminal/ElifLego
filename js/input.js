@@ -3,6 +3,7 @@ import { renderer, pointer, dolly } from './scene.js';
 import { selType, setRot, rot } from './selection.js';
 import { updateGhost, hideGhost, applyRotation, nudge, ghostState } from './ghost.js';
 import { placeAt, deleteRoot, rootUnder, setHovered } from './blocks.js';
+import { saveBuild } from './persistence.js';
 import { deselect } from './ui.js';
 
 let downPos = null, moved = false;
@@ -26,8 +27,8 @@ export function setupEvents() {
         const click = downPos && !moved;   // a tap, not an orbit drag
         downPos = null;
         if (!click) return;
-        if (selType) placeAt(ghostState);
-        else { const r = rootUnder(); if (r) deleteRoot(r); }
+        if (selType) { if (placeAt(ghostState)) saveBuild(); }
+        else { const r = rootUnder(); if (r) { deleteRoot(r); saveBuild(); } }
     });
 
     el.addEventListener('pointerleave', () => { hideGhost(); setHovered(null); });

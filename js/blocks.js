@@ -2,37 +2,56 @@
 import { PLATE } from './constants.js';
 import { scene, camera, raycaster, pointer } from './scene.js';
 import { makeGroup, disposeGroup, bodyColor } from './factory.js';
-import { getKind, heightPlatesOf } from './registry.js';
+import { getKind, heightPlatesOf, footprint } from './registry.js';
 import { selType, selSize, selColor, rot } from './selection.js';
 import { STUD } from './constants.js';
-import { addVoxels, removeVoxels, isValid } from './occupancy.js';
+import { addVoxels, removeVoxels, isValid, footCells } from './occupancy.js';
 
-export const placedBlocks = [];   // { id, group, voxels, meshes, level, hP }
+export const placedBlocks = [];   // { id, group, voxels, meshes, level, hP, spec }
 export const placedMeshes = [];   // flattened child meshes, for raycasting
 let nextId = 1;
 let hoveredRoot = null;
 
-export function placeAt(st) {
-    if (!st) return;
-    // Re-validate against live occupancy (guards double-taps, keeps nudged positions honest).
-    const hP = heightPlatesOf(selType, selSize);
-    if (!isValid(st.cells, st.level, hP)) return false;
+// Footprint after rotation (swaps W/D on 90°/270°).
+function effFoot(size, rotation) {
+    const [w, d] = footprint(size);
+    return (rotation % 2) ? [d, w] : [w, d];
+}
+
+// Place a block from a full spec. This is the single source of truth for creation,
+// used by both interactive placement and save/load restore. opts.validate=false trusts
+// the caller (restore of previously-valid data).
+export function addBlock(spec, opts = {}) {
+    const { type, size, color, rot: r = 0, minGX, minGZ, level } = spec;
+    const [ew, ed] = effFoot(size, r);
+    const hP = heightPlatesOf(type, size);
+    const cells = footCells(minGX, minGZ, ew, ed);
+    if (opts.validate !== false && !isValid(cells, level, hP)) return false;
 
     const h = hP * PLATE;
-    const g = makeGroup(selType, selSize, bodyColor(selType, selColor));
-    const cx = (st.minGX + (st.ew - 1) / 2) * STUD;
-    const cz = (st.minGZ + (st.ed - 1) / 2) * STUD;
-    g.position.set(cx, st.level * PLATE + h / 2, cz);
-    g.rotation.y = rot * Math.PI / 2;
+    const g = makeGroup(type, size, color);
+    const cx = (minGX + (ew - 1) / 2) * STUD;
+    const cz = (minGZ + (ed - 1) / 2) * STUD;
+    g.position.set(cx, level * PLATE + h / 2, cz);
+    g.rotation.y = r * Math.PI / 2;
     scene.add(g);
 
-    const voxels = addVoxels(st.cells, st.level, hP);
+    const voxels = addVoxels(cells, level, hP);
     const meshes = g.children.filter(c => c.isMesh);
-    const rec = { id: nextId++, group: g, voxels, meshes, level: st.level, hP };
+    const rec = { id: nextId++, group: g, voxels, meshes, level, hP, spec: { type, size, color, rot: r, minGX, minGZ, level } };
     g.userData.record = rec;
     placedBlocks.push(rec);
     meshes.forEach(m => placedMeshes.push(m));
     return true;
+}
+
+// Interactive placement from the current selection + the snapped ghost target.
+export function placeAt(st) {
+    if (!st) return false;
+    return addBlock({
+        type: selType, size: selSize, color: bodyColor(selType, selColor), rot,
+        minGX: st.minGX, minGZ: st.minGZ, level: st.level,
+    });
 }
 
 export function deleteRoot(root) {

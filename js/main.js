@@ -5,6 +5,7 @@ import { initGhost } from './ghost.js';
 import { buildUI, updateModePill } from './ui.js';
 import { setupEvents } from './input.js';
 import { placedBlocks } from './blocks.js';
+import { loadBuild } from './persistence.js';
 
 const canvas = document.getElementById('lego-canvas');
 const container = document.getElementById('canvas-container');
@@ -15,6 +16,7 @@ buildUI();
 applyTheme('Tron');
 setupEvents();
 updateModePill();
+loadBuild();            // restore the previous build, if any
 
 let t = 0;
 function animate() {

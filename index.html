@@ -31,7 +31,12 @@
         <div id="palette"></div>
 
         <div id="mode-pill" class="mode-pill">MODE: ORBIT — pick a piece</div>
-        <button id="clear-all" class="block-button w-full mt-3" style="padding:8px;">Clear All</button>
+        <div class="flex gap-1 mt-2">
+            <button id="export-build" class="block-button flex-1" style="padding:6px;">Export</button>
+            <button id="import-build" class="block-button flex-1" style="padding:6px;">Import</button>
+        </div>
+        <button id="clear-all" class="block-button w-full mt-1" style="padding:8px;">Clear All</button>
+        <input id="import-file" type="file" accept="application/json" class="hidden">
     </aside>
 
     <main id="canvas-container" class="flex-1 h-full relative">
